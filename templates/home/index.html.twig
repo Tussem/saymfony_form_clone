@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Forms</h1>
+
+    <div class="row">
+        {% for form in forms %}
+            <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                <div class="card shadow-lg {% if form.isPublic %}border-success{% else %}border-secondary{% endif %} mb-4 w-100">
+                    <div class="card-header {% if form.isPublic %}bg-success text-white{% else %}bg-secondary text-white{% endif %}">
+                        <h5 class="mb-0">{{ form.title }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <strong class="text-muted">Tags:</strong> 
+                            <span class="badge bg-info text-dark">{{ form.tags|join('</span> <span class="badge bg-info text-dark">') }}</span>
+                            <br>
+                            <strong class="text-muted">Responses:</strong> 
+                            <span class="badge bg-primary">{{ form.responses|length }}</span>
+                        </p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="{{ path('app_form_show', {id: form.id}) }}" class="btn btn-outline-primary btn-sm">View</a>
+                        <a href="{{ path('form_responses', {id: form.id}) }}" class="btn btn-outline-secondary btn-sm">Responses</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No forms found.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

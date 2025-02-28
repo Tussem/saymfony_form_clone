@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Form: {{ form_entity.title }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">{{ form_entity.title }}</h1>
+
+    <div class="card shadow-lg p-4">
+        <h3 class="mb-3">Fields</h3>
+        <form method="POST" action="{{ path('app_form_edit', {'id': form_entity.id}) }}">
+            {% for field in fields %}
+                <div class="form-group mb-4">
+                    <label for="field_{{ field.id }}" class="fw-bold">{{ field.label }}</label>
+
+                    {# Render Text Field #}
+                    {% if field.type == 'text' %}
+                        <input type="text" id="field_{{ field.id }}" name="fields[{{ field.id }}]" value="{{ field.options }}" class="form-control">
+
+                    {# Render Textarea Field #}
+                    {% elseif field.type == 'textarea' %}
+                        <textarea id="field_{{ field.id }}" name="fields[{{ field.id }}]" class="form-control">{{ field.options }}</textarea>
+
+                    {# Render Dropdown (Select) Field #}
+                    {% elseif field.type == 'select' %}
+                        <select id="field_{{ field.id }}" name="fields[{{ field.id }}]" class="form-select">
+                            {# Split options by comma and loop through each option #}
+                            {% set options = field.options|split(',') %}
+                            {% for option in options %}
+                                <option value="{{ option }}" {% if option == field.value %}selected{% endif %}>{{ option }}</option>
+                            {% endfor %}
+                        </select>
+
+                    {# Render Radio Buttons Field #}
+                    {% elseif field.type == 'radio' %}
+                        {% set options = field.options|split(',') %}
+                        <div class="mt-2">
+                            {% for option in options %}
+                                <div class="form-check">
+                                    <input type="radio" id="field_{{ field.id }}_{{ loop.index }}" name="fields[{{ field.id }}]" value="{{ option }}" class="form-check-input">
+                                    <label class="form-check-label" for="field_{{ field.id }}_{{ loop.index }}">{{ option }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                    {# Render Checkbox Field #}
+                    {% elseif field.type == 'checkbox' %}
+                        {% set options = field.options|split(',') %}
+                        <div class="mt-2">
+                            {% for option in options %}
+                                <div class="form-check">
+                                    <input type="checkbox" id="field_{{ field.id }}_{{ loop.index }}" name="fields[{{ field.id }}][]" value="{{ option }}" class="form-check-input">
+                                    <label class="form-check-label" for="field_{{ field.id }}_{{ loop.index }}">{{ option }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                    {% else %}
+                        <p>{{ field.options }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg">Save changes</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ path('app_form_index') }}" class="btn btn-outline-secondary">Back to list</a>
+    </div>
+</div>
+{% endblock %}

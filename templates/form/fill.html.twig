@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Fill Form: {{ form.title }}</h1>
+
+<form method="POST">
+    {% for field in form.fields %}
+        <label>{{ field.label }}</label>
+        {% if field.type == 'text' %}
+            <input type="text" name="answers[]">
+        {% elseif field.type == 'checkbox' %}
+            <input type="checkbox" name="answers[]" value="checked">
+        {% elseif field.type == 'radio' %}
+            {% for option in field.options|split(',') %}
+                <input type="radio" name="answers[]" value="{{ option }}">{{ option }}
+            {% endfor %}
+        {% elseif field.type == 'dropdown' %}
+            <select name="answers[]">
+                {% for option in field.options|split(',') %}
+                    <option value="{{ option }}">{{ option }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
+    {% endfor %}
+
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

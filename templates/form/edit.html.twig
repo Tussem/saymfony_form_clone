@@ -1,0 +1,12 @@
+{# templates/form/edit.html.twig #}
+
+{{ form_start(form) }}
+{{ form_row(form.title) }}
+{{ form_row(form.user) }}
+
+{# Render dynamically created fields like select dropdowns, checkboxes, etc. #}
+{% for field in form %}
+    {{ form_row(field) }}
+{% endfor %}
+
+{{ form_end(form) }}

@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{# {% block body %}
+
+
+<h1>Responses for "{{ form.title }}"</h1>
+
+<table class="table table-striped {% if darkMode %}table-dark{% endif %}">
+    <thead>
+        <tr>
+            <th>#</th>
+            {% for field in form.fields %}
+                <th>{{ field.label }}</th>
+            {% endfor %}
+            <th>Submitted At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for response in responses %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                {% for answer in response.answers %}
+                    <td>{{ answer }}</td>
+                {% endfor %}
+                <td>{{ response.submittedAt|date('Y-m-d H:i') }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<a href="{{ path('form_export', {id: form.id}) }}">Export to CSV</a>
+
+{% endblock %} #}
+
+{% block body %}
+    <h1>Responses for "{{ form.title }}"</h1>
+    <table class="table table-striped" x-bind:class="{'table-dark': darkMode}">
+    <thead>
+    <tr>
+    <th>#</th>
+    {% for field in form.fields %}
+    <th>{{ field.label }}</th>
+    {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for response in form.responses %}
+    <tr>
+        <td>{{ response.id }}</td>
+        {% for field in form.fields %}
+        <td>{{ response.getAnswerForField(field) }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+{% endblock %}

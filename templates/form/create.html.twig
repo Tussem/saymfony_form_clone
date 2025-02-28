@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Create a Form</h1>
+
+    <form method="POST" class="card p-4 shadow-lg">
+        <div class="mb-3">
+            <label class="form-label">Form Title:</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <h3 class="mb-3">Form Fields</h3>
+        <div x-data="{ fields: [] }">
+            <template x-for="(field, index) in fields" :key="index">
+                <div class="mb-3 border p-3 rounded">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <input type="text" name="labels[]" class="form-control" placeholder="Field Label" required>
+                        </div>
+                        <div class="col-md-4">
+                            <select name="types[]" class="form-select">
+                                <option value="text">Text</option>
+                                <option value="checkbox">Checkbox</option>
+                                <option value="radio">Radio</option>
+                                <option value="dropdown">Dropdown</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" name="options[]" class="form-control" placeholder="Options (comma-separated)">
+                        </div>
+                    </div>
+                    <div class="text-end mt-2">
+                        <button type="button" class="btn btn-danger btn-sm" @click="fields.splice(index, 1)">Remove</button>
+                    </div>
+                </div>
+            </template>
+            <button type="button" class="btn btn-success mt-2" @click="fields.push({})">Add Field</button>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Create Form</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

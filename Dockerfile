@@ -1,12 +1,13 @@
 # Use the official PHP 8+ with Apache
 FROM php:8.2-apache
 
-RUN [ -d "/var/www/html/var" ] && chown -R www-data:www-data /var/www/html/var || echo "Directory does not exist, skipping chown"
-
-
+RUN mkdir -p /var/www/html/var && chown -R www-data:www-data /var/www/html/var
 
 # Set working directory
 WORKDIR /var/www/html
+
+
+
 
 # Install required PHP extensions
 RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev \
@@ -30,3 +31,4 @@ EXPOSE 80
 
 # Start Apache
 CMD ["apache2-foreground"]
+

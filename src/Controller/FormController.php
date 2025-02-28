@@ -38,26 +38,6 @@ final class FormController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_form_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $form = new Form();
-        $form = $this->createForm(FormType::class, $form);
-        $form->handleRequest($request);
-    
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($form->getData());  // Persist the form data after it's filled
-            $entityManager->flush();
-    
-            return $this->redirectToRoute('app_form_index', [], Response::HTTP_SEE_OTHER);
-        }
-    
-        // Pass the FormView to the template
-        return $this->render('form/new.html.twig', [
-            'form' => $form->createView(),  // Pass the FormView for rendering
-        ]);
-    }
-
     #[Route('/{id}', name: 'app_form_show', methods: ['GET'])]
     public function show(Form $form): Response
     {

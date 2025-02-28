@@ -1,6 +1,10 @@
 # Use the official PHP 8+ with Apache
 FROM php:8.2-apache
 
+RUN [ -d "/var/www/html/var" ] && chown -R www-data:www-data /var/www/html/var || echo "Directory does not exist, skipping chown"
+
+
+
 # Set working directory
 WORKDIR /var/www/html
 

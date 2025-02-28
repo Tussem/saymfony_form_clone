@@ -8,30 +8,56 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 180, unique: true)]
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
     private ?string $email = null;
 
-    /**
-     * @var list<string> The user roles
-     */
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[Gedmo\Timestampable(on: 'create')]
+    private ?\DateTime $createdAt = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true, options: ['default' => null])]
+    #[Gedmo\Timestampable(on: 'update')]
+    private ?\DateTime $updatedAt = null;
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        if ($this->createdAt === null) {
+            $this->createdAt = new \DateTime();
+        }
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTime();
+    }
+
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: Form::class, orphanRemoval: true)]
+    private Collection $forms;
+
+    public function __construct()
+    {
+        $this->forms = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -46,47 +72,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     *
-     * @return list<string>
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-
         return array_unique($roles);
     }
 
-    /**
-     * @param list<string> $roles
-     */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
-
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -95,66 +101,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
-
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
-    #[ORM\OneToMany(mappedBy: "user", targetEntity: Form::class, orphanRemoval: true)]
-    private Collection $forms;
-
-    /**
-     * @var Collection<int, Form>
-     */
-    #[ORM\OneToMany(targetEntity: Form::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $userForms;
-
-    public function __construct()
+    public function getCreatedAt(): ?\DateTime
     {
-        $this->forms = new ArrayCollection();
-        $this->userForms = new ArrayCollection();
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
     }
 
     public function getForms(): Collection
     {
         return $this->forms;
-    }
-
-    /**
-     * @return Collection<int, Form>
-     */
-    public function getUserForms(): Collection
-    {
-        return $this->userForms;
-    }
-
-    public function addUserForm(Form $userForm): static
-    {
-        if (!$this->userForms->contains($userForm)) {
-            $this->userForms->add($userForm);
-            $userForm->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserForm(Form $userForm): static
-    {
-        if ($this->userForms->removeElement($userForm)) {
-            // set the owning side to null (unless already changed)
-            if ($userForm->getUser() === $this) {
-                $userForm->setUser(null);
-            }
-        }
-
-        return $this;
     }
 }

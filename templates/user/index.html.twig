@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Details{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">User Details</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-bordered">
+                <tbody>
+                    <tr>
+                        <th scope="row" class="bg-light">ID:</th>
+                        <td>{{ user.id }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="bg-light">Email:</th>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="bg-light">Created At:</th>
+                        <td>{{ user.createdAt|date('Y-m-d H:i:s') }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="bg-light">Updated At:</th>
+                        <td>{{ user.updatedAt ? user.updatedAt|date('Y-m-d H:i:s') : 'Never Updated' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-center">
+            <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

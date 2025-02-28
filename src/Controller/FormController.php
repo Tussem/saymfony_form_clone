@@ -42,7 +42,6 @@ final class FormController extends AbstractController
     public function show(Form $form): Response
     {
         $formFields = $form->getFields();
-        // Use the injected repository to fetch the form
         $formEntity = $this->formRepository->find($form->getId()); // Example retrieval
         $fields = $formEntity->getFields();
 
@@ -56,37 +55,33 @@ final class FormController extends AbstractController
     #[Route('/{id}/edit', name: 'app_form_edit', methods: ['GET', 'POST'])]
 public function edit(Request $request, Form $form): Response
 {
-    $formFields = $form->getFields();  // Get dynamic fields
-
-    // Create a new FormData object to hold dynamic fields
+    $formFields = $form->getFields(); 
     $formData = new FormData();
 
-    // Create a form for editing the Form entity (main entity)
+
     $formBuilder = $this->createForm(FormType::class, $form);
 
-    // Dynamically add form fields like select, checkboxes, etc.
+   
     foreach ($formFields as $field) {
         $fieldName = 'field_' . $field->getId();
-        $choices = explode(',', $field->getOptions());  // Assuming options are comma-separated
+        $choices = explode(',', $field->getOptions());  
         $formBuilder->add($fieldName, ChoiceType::class, [
-            'choices' => array_flip($choices),  // Convert options to choices
-            'expanded' => $field->getType() === 'checkbox',  // For checkboxes, use expanded
-            'multiple' => $field->getType() === 'checkbox',  // For multiple checkboxes
+            'choices' => array_flip($choices),  
+            'expanded' => $field->getType() === 'checkbox',  
+            'multiple' => $field->getType() === 'checkbox',  
         ]);
     }
 
-    // Handle the form submission
+
     $form = $formBuilder->getForm();
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-        // Get the dynamic field values from the form data and store them in FormData
         foreach ($formFields as $field) {
             $fieldName = 'field_' . $field->getId();
             $formData->setDynamicField($fieldName, $form->get($fieldName)->getData());
         }
 
-        // Persist changes if necessary
         $this->getDoctrine()->getManager()->flush();
 
         return $this->redirectToRoute('app_form_show', ['id' => $form->getId()]);
@@ -100,18 +95,17 @@ public function edit(Request $request, Form $form): Response
 #[Route('/{id}', name: 'app_form_delete', methods: ['POST'])]
 public function delete(Request $request, Form $form, EntityManagerInterface $entityManager): Response
 {
-    // Check if the CSRF token is valid
+
     $csrfToken = $request->request->get('_token');
     if ($this->isCsrfTokenValid('delete'.$form->getId(), $csrfToken)) {
-        // If the token is valid, remove the form from the database
+
         $entityManager->remove($form);
         $entityManager->flush();
         
-        // Redirect after deletion
+
         return $this->redirectToRoute('app_form_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    // If the CSRF token is invalid, show an error or redirect
     return $this->redirectToRoute('app_form_index');
 }
 
@@ -120,9 +114,9 @@ public function delete(Request $request, Form $form, EntityManagerInterface $ent
     {
 
         $form = new Form();
-        $user = $this->getUser(); // Get the currently logged-in user
+        $user = $this->getUser(); 
 
-        $form->setUser($user); // Associate the user as the form owner
+        $form->setUser($user); 
 
 
         if (!$this->getUser()) {
@@ -136,7 +130,6 @@ public function delete(Request $request, Form $form, EntityManagerInterface $ent
 
             $em->persist($form);
 
-            // Handling dynamic fields
             $labels = $request->request->all('labels', []);
             $types = $request->request->all('types', []);
             $options = $request->request->all('options', []);
